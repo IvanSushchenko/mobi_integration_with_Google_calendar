@@ -11,7 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4251d9f5-bb70-4856-810d-feb0d939c5c3" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/settings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,8 +149,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.test2" />
-        <item itemvalue="Python.test" />
         <item itemvalue="Python.test3" />
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.clear_day" />
       </list>
@@ -193,26 +194,26 @@
       <screen x="0" y="34" width="1920" height="1046" />
     </state>
     <state x="690" y="258" width="530" height="605" key="FileChooserDialogImpl/0.34.1920.1046@0.34.1920.1046" timestamp="1590064077387" />
-    <state width="1892" height="259" key="GridCell.Tab.0.bottom" timestamp="1590280920343">
+    <state width="1892" height="259" key="GridCell.Tab.0.bottom" timestamp="1590356211697">
       <screen x="0" y="34" width="1920" height="1046" />
     </state>
-    <state width="1892" height="259" key="GridCell.Tab.0.bottom/0.34.1920.1046@0.34.1920.1046" timestamp="1590280920343" />
-    <state width="1892" height="259" key="GridCell.Tab.0.center" timestamp="1590280920342">
+    <state width="1892" height="259" key="GridCell.Tab.0.bottom/0.34.1920.1046@0.34.1920.1046" timestamp="1590356211697" />
+    <state width="1892" height="259" key="GridCell.Tab.0.center" timestamp="1590356211697">
       <screen x="0" y="34" width="1920" height="1046" />
     </state>
-    <state width="1892" height="259" key="GridCell.Tab.0.center/0.34.1920.1046@0.34.1920.1046" timestamp="1590280920342" />
-    <state width="1892" height="259" key="GridCell.Tab.0.left" timestamp="1590280920340">
+    <state width="1892" height="259" key="GridCell.Tab.0.center/0.34.1920.1046@0.34.1920.1046" timestamp="1590356211697" />
+    <state width="1892" height="259" key="GridCell.Tab.0.left" timestamp="1590356211697">
       <screen x="0" y="34" width="1920" height="1046" />
     </state>
-    <state width="1892" height="259" key="GridCell.Tab.0.left/0.34.1920.1046@0.34.1920.1046" timestamp="1590280920340" />
-    <state width="1892" height="259" key="GridCell.Tab.0.right" timestamp="1590280920342">
+    <state width="1892" height="259" key="GridCell.Tab.0.left/0.34.1920.1046@0.34.1920.1046" timestamp="1590356211697" />
+    <state width="1892" height="259" key="GridCell.Tab.0.right" timestamp="1590356211697">
       <screen x="0" y="34" width="1920" height="1046" />
     </state>
-    <state width="1892" height="259" key="GridCell.Tab.0.right/0.34.1920.1046@0.34.1920.1046" timestamp="1590280920342" />
-    <state x="396" y="226" width="1117" height="668" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1590196896832">
+    <state width="1892" height="259" key="GridCell.Tab.0.right/0.34.1920.1046@0.34.1920.1046" timestamp="1590356211697" />
+    <state x="396" y="226" width="1117" height="668" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1590352544905">
       <screen x="0" y="34" width="1920" height="1046" />
     </state>
-    <state x="396" y="226" width="1117" height="668" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.34.1920.1046@0.34.1920.1046" timestamp="1590196896832" />
+    <state x="396" y="226" width="1117" height="668" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.34.1920.1046@0.34.1920.1046" timestamp="1590352544905" />
     <state x="539" y="45" width="840" height="1034" key="search.everywhere.popup" timestamp="1590194008742">
       <screen x="0" y="34" width="1920" height="1046" />
     </state>
