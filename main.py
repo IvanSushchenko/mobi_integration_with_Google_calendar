@@ -7,6 +7,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import pickle
 import os
+import pytz
 import re
 
 settings_file = "settings.json"
@@ -34,8 +35,8 @@ class Mobi:
                 date = lesson_data[0]
                 lesson_info = lesson_data[1].split("<br />")
                 time_range = lesson_info[0].split(" - ")
-                time_start = date + "T" + time_range[0] + ":00"
-                time_end = date + "T" + time_range[1] + ":00"
+                time_start = (datetime.strptime(date + time_range[0], "%Y-%m-%d%H:%M")).astimezone(pytz.timezone("Europe/Warsaw")).isoformat()
+                time_end = (datetime.strptime(date + time_range[1], "%Y-%m-%d%H:%M")).astimezone(pytz.timezone("Europe/Warsaw")).isoformat()
                 summary = lesson_info[1]
                 lecturer_auditorium = (lesson_info[2].split("- ", 1))[1]
                 auditorium = (re.search("\((.*)\)", lecturer_auditorium).group(1))
@@ -107,10 +108,11 @@ class Google_Calendar:
                 elif new_calendar.lower() == "n":
                     pass
 
-    def get_planned_events(self, calendar_id):
+    def get_planned_events(self, calendar_id, week_range):
         planned_event_dict = {}
-        today = str((datetime.now(timezone.utc).astimezone()).isoformat())
-        planned_event_list = (self.client.events().list(calendarId=calendar_id, timeMin=today).execute())["items"]
+        date_min = str((datetime.strptime(list(week_range.keys())[0], "%Y-%m-%d").astimezone()).isoformat())
+        date_max = str((datetime.strptime(list(week_range.keys())[-1], "%Y-%m-%d").astimezone()).isoformat())
+        planned_event_list = (self.client.events().list(calendarId=calendar_id, timeMin=date_min, timeMax=date_max).execute())["items"]
         for event in planned_event_list:
             planned_event_dict[event["start"]["dateTime"]] = event["summary"]
         return planned_event_dict
@@ -149,16 +151,18 @@ class App:
     def get_week_range(self, current_week):
         week_range = {}
         additional_weeks = timedelta(days=current_week * 7)
-        # week_start = datetime.today() - timedelta(days=datetime.today().weekday()) + additional_weeks
-        week_start = datetime.strptime("2019-09-09", "%Y-%m-%d")
+        week_start = datetime.today() - timedelta(days=datetime.today().weekday()) + additional_weeks
         for day in range(0, 5):
             current_day = week_start + timedelta(days=day)
             week_range[current_day.strftime("%Y-%m-%d")] = []
         return week_range
 
     def compare_plans(self, new_plan, existing_plan):
-        print(new_plan)
-        print(existing_plan)
+        print("MOBI: ", new_plan)
+        print("GOOGLE: ", existing_plan)
+        for event in existing_plan:
+            print(event)
+
 
 
 def main():
@@ -169,16 +173,16 @@ def main():
     google = Google_Calendar()
     mobi = Mobi()
     calendar_id = google.get_calendar_id()
-    existing_plan = google.get_planned_events(calendar_id)
+    print(calendar_id)
     print("Wait, creating events ...")
     for current_week in range(settings["week_limit"]):
         week_range = app.get_week_range(current_week)
-        print(week_range)
         new_plan = mobi.get_plan(week_range)
-        plan_changes = app.compare_plans(new_plan, existing_plan)
-    #     for lesson in new_plan:
-    #         event_json = google.create_json_event(lesson)
-    #         google.create_event(event_json, calendar_id)
+        #existing_plan = google.get_planned_events(calendar_id, week_range)
+        #plan_changes = app.compare_plans(new_plan, existing_plan)
+        for lesson in new_plan:
+            event_json = google.create_json_event(lesson)
+            google.create_event(event_json, calendar_id)
     print("Done")
 
 
