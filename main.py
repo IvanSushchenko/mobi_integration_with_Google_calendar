@@ -37,11 +37,11 @@ class Mobi:
                 time_range = lesson_info[0].split(" - ")
                 time_start = (datetime.strptime(date + time_range[0], "%Y-%m-%d%H:%M")).astimezone(pytz.timezone("Europe/Warsaw")).isoformat()
                 time_end = (datetime.strptime(date + time_range[1], "%Y-%m-%d%H:%M")).astimezone(pytz.timezone("Europe/Warsaw")).isoformat()
-                summary = lesson_info[1]
                 lecturer_auditorium = (lesson_info[2].split("- ", 1))[1]
                 auditorium = (re.search("\((.*)\)", lecturer_auditorium).group(1))
-                lesson_refactored_info = {"time_start": time_start, "time_end": time_end, "summary": summary,
-                                          "lecturer_auditorium": lecturer_auditorium, "auditorium": auditorium}
+                summary = auditorium + " - " + lesson_info[1]
+                description = lesson_info[1], ": ", lecturer_auditorium
+                lesson_refactored_info = {"time_start": time_start, "time_end": time_end, "summary": summary, "description": description}
                 refactored_plan.append(lesson_refactored_info)
         return refactored_plan
 
@@ -98,33 +98,32 @@ class Google_Calendar:
             else:
                 new_calendar = input("No such calendar, do you want to create new one? (Y or N)\n: ")
                 if new_calendar.lower() == "y":
+                    print("Creating new calendar, wait...")
                     # new calendar body
                     calendar_body = {
                         'summary': calendar_name,
                         'timeZone': 'Europe/Warsaw'
                     }
                     calendar_id = (self.client.calendars().insert(body=calendar_body).execute())["id"]
+                    print("New calendar created")
                     return calendar_id
                 elif new_calendar.lower() == "n":
                     pass
 
     def get_planned_events(self, calendar_id, week_range):
-        planned_event_dict = {}
+        planned_events= []
         date_min = str((datetime.strptime(list(week_range.keys())[0], "%Y-%m-%d").astimezone()).isoformat())
-        date_max = str((datetime.strptime(list(week_range.keys())[-1], "%Y-%m-%d").astimezone()).isoformat())
+        date_max = str(((datetime.strptime(list(week_range.keys())[-1], "%Y-%m-%d") + timedelta(days=1)).astimezone()).isoformat())
         planned_event_list = (self.client.events().list(calendarId=calendar_id, timeMin=date_min, timeMax=date_max).execute())["items"]
         for event in planned_event_list:
-            planned_event_dict[event["start"]["dateTime"]] = event["summary"]
-        return planned_event_dict
+            planned_events.append({"time_start": event["start"]["dateTime"], "summary": event["summary"], "event_id": event["id"]})
+        return planned_events
 
     def create_json_event(self, event_data):
         event = {
-            'summary': "({auditorium}) - {summary}".format(auditorium=event_data["auditorium"],
-                                                           summary=event_data["summary"]),
+            'summary': event_data["summary"],
             'location': 'ZSŁ',
-            'description': "{summary} - {lecturer_auditorium}".format(summary=event_data["summary"],
-                                                                      lecturer_auditorium=event_data[
-                                                                          "lecturer_auditorium"]),
+            'description': event_data["description"],
             'start': {
                 'dateTime': event_data["time_start"],
                 'timeZone': 'Europe/Warsaw',
@@ -142,6 +141,14 @@ class Google_Calendar:
         }
         return event
 
+    def remove_event(self, calendar_id, event_id):
+        self.client.events().delete(calendarId=calendar_id, eventId=event_id).execute()
+
+    def update_event(self, calendar_id, event_id, changes):
+        event = self.client.events().get(calendarId=calendar_id, eventId=event_id,).execute()
+        event['summary'] = 'Appointment at Somewhere'
+        self.client.events().update(calendarId=calendar_id, eventId=event_id, body=event).execute()
+
     def create_event(self, event_json, calendar_id):
         self.client.events().insert(calendarId=calendar_id, body=event_json).execute()
 
@@ -157,11 +164,37 @@ class App:
             week_range[current_day.strftime("%Y-%m-%d")] = []
         return week_range
 
+    def get_old(self, new_plan, existing_plan):
+        old = existing_plan.copy()
+        update = []
+        for existing_event in existing_plan:
+            for lesson in new_plan:
+                if existing_event["time_start"] in lesson.values():
+                    if existing_event["summary"] in lesson.values():
+                        old.remove(existing_event)
+                    else:
+                        update.append(existing_plan)
+        changes = {"delete": old, "update_from": update}
+        return changes
+
+    def get_new(self, new_plan, existing_plan):
+        new = new_plan.copy()
+        update = []
+        for lesson in new_plan:
+            for existing_event in existing_plan:
+                if existing_event["time_start"] in lesson.values():
+                    if existing_event["summary"] in lesson.values():
+                        new.remove(lesson)
+                    else:
+                        update.append(lesson)
+        changes = {"create": new, "update_to": update}
+        return changes
+
     def compare_plans(self, new_plan, existing_plan):
-        print("MOBI: ", new_plan)
-        print("GOOGLE: ", existing_plan)
-        for event in existing_plan:
-            print(event)
+        old = self.get_old(new_plan, existing_plan)
+        new = self.get_new(new_plan, existing_plan)
+        changes = {**old, **new}
+        return changes
 
 
 
@@ -172,17 +205,19 @@ def main():
     app = App()
     google = Google_Calendar()
     mobi = Mobi()
-    calendar_id = google.get_calendar_id()
+    #calendar_id = google.get_calendar_id()
+    calendar_id = "flmv1dh5pdnesk69qvtddgtvlc@group.calendar.google.com"
     print(calendar_id)
-    print("Wait, creating events ...")
+    print("Wait...")
     for current_week in range(settings["week_limit"]):
         week_range = app.get_week_range(current_week)
         new_plan = mobi.get_plan(week_range)
-        #existing_plan = google.get_planned_events(calendar_id, week_range)
-        #plan_changes = app.compare_plans(new_plan, existing_plan)
-        for lesson in new_plan:
-            event_json = google.create_json_event(lesson)
-            google.create_event(event_json, calendar_id)
+        existing_plan = google.get_planned_events(calendar_id, week_range)
+        plan_changes = app.compare_plans(new_plan, existing_plan)
+        print(plan_changes)
+        # for lesson in new_plan:
+        #     event_json = google.create_json_event(lesson)
+        #     google.create_event(event_json, calendar_id)
     print("Done")
 
 
