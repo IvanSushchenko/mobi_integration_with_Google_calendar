@@ -64,9 +64,9 @@ class GoogleCalendar:
     # Import settings
     with open(settings_file) as file:
         settings = (json.load(file))["google_settings"]
-
     SCOPES = ['https://www.googleapis.com/auth/calendar']
 
+    creds = None
     # Check if token already exist in dir
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:

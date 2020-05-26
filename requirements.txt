@@ -1,11 +1,7 @@
 requests
 bs4
-json
-os
 datetime
-googleapiclient
-google_auth_oauthlib
-google
-pickle
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
 pytz
-import re

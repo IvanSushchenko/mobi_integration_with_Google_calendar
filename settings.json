@@ -8,6 +8,6 @@
     "plan_url": "https://zslpoznan.mobidziennik.pl/dziennik/planlekcji?typ=podstawowy&tydzien="
   },
   "google_settings": {
-    "credentials_file": "NAME OF GOOGLE CREDENTIALS FILE"
+    "credentials_file": "google_credentials.json"
   }
 }

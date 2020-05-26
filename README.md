@@ -22,7 +22,7 @@ or
 8. Select "External"
 9. Fill all fields:
     - Enter name
-    - Click "Add scope" and select: "Google Calendar API /auth/calendar.events"
+    - Click "Add scope" and select: "Google Calendar API /auth/calendar"
     - Click "Save"
 10. Click "Credentials" in sidebar
 11. Click "Create Credentials" and select "Create OAuth client ID"
@@ -68,12 +68,14 @@ or
     }`
 
 ### Run script
+1. Run script
 
-    `python main.py`
-    
+    `python main.py`  
 or
-    
+
     `python3 main.py`
+    
+2. Than you will be redirect to google service, login.
 
 
 
