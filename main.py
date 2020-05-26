@@ -60,7 +60,7 @@ class Mobi:
         return refactored_plan
 
 
-class Google_Calendar:
+class GoogleCalendar:
     # Import settings
     with open(settings_file) as file:
         settings = (json.load(file))["google_settings"]
@@ -144,12 +144,7 @@ class Google_Calendar:
     def remove_event(self, calendar_id, event_id):
         self.client.events().delete(calendarId=calendar_id, eventId=event_id).execute()
 
-    def update_event(self, calendar_id, event_id, changes):
-        event = self.client.events().get(calendarId=calendar_id, eventId=event_id,).execute()
-        event['summary'] = 'Appointment at Somewhere'
-        self.client.events().update(calendarId=calendar_id, eventId=event_id, body=event).execute()
-
-    def create_event(self, event_json, calendar_id):
+    def create_event(self, calendar_id, event_json):
         self.client.events().insert(calendarId=calendar_id, body=event_json).execute()
 
 
@@ -166,28 +161,22 @@ class App:
 
     def get_old(self, new_plan, existing_plan):
         old = existing_plan.copy()
-        update = []
         for existing_event in existing_plan:
             for lesson in new_plan:
                 if existing_event["time_start"] in lesson.values():
                     if existing_event["summary"] in lesson.values():
                         old.remove(existing_event)
-                    else:
-                        update.append(existing_plan)
-        changes = {"delete": old, "update_from": update}
+        changes = {"delete": old}
         return changes
 
     def get_new(self, new_plan, existing_plan):
         new = new_plan.copy()
-        update = []
         for lesson in new_plan:
             for existing_event in existing_plan:
                 if existing_event["time_start"] in lesson.values():
                     if existing_event["summary"] in lesson.values():
                         new.remove(lesson)
-                    else:
-                        update.append(lesson)
-        changes = {"create": new, "update_to": update}
+        changes = {"create": new}
         return changes
 
     def compare_plans(self, new_plan, existing_plan):
@@ -203,21 +192,24 @@ def main():
     with open(settings_file) as file:
         settings = (json.load(file))["app_settings"]
     app = App()
-    google = Google_Calendar()
+    google = GoogleCalendar()
     mobi = Mobi()
-    #calendar_id = google.get_calendar_id()
-    calendar_id = "flmv1dh5pdnesk69qvtddgtvlc@group.calendar.google.com"
-    print(calendar_id)
-    print("Wait...")
+    calendar_id = google.get_calendar_id()
     for current_week in range(settings["week_limit"]):
         week_range = app.get_week_range(current_week)
         new_plan = mobi.get_plan(week_range)
         existing_plan = google.get_planned_events(calendar_id, week_range)
         plan_changes = app.compare_plans(new_plan, existing_plan)
-        print(plan_changes)
-        # for lesson in new_plan:
-        #     event_json = google.create_json_event(lesson)
-        #     google.create_event(event_json, calendar_id)
+        if bool(plan_changes.get('delete')) is False and bool(plan_changes.get('create')) is False:
+            print("Nothing to change")
+        else:
+            print("Updating calendar, wait...")
+            for event in plan_changes["delete"]:
+                event_id = event["event_id"]
+                google.remove_event(calendar_id, event_id)
+            for event in plan_changes["create"]:
+                event_json = google.create_json_event(event)
+                google.create_event(calendar_id, event_json)
     print("Done")
 
 
