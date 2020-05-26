@@ -1,6 +1,6 @@
 {
   "app_settings": {
-    "week_limit": 2
+    "week_limit": 1
   },
   "mobi_settings": {
     "main_url": "https://zslpoznan.mobidziennik.pl/dziennik",
@@ -8,6 +8,6 @@
     "plan_url": "https://zslpoznan.mobidziennik.pl/dziennik/planlekcji?typ=podstawowy&tydzien="
   },
   "google_settings": {
-    "credentials_file": "mobi_credentials.json"
+    "credentials_file": "NAME OF GOOGLE CREDENTIALS FILE"
   }
 }

@@ -1,0 +1,11 @@
+requests
+bs4
+json
+os
+datetime
+googleapiclient
+google_auth_oauthlib
+google
+pickle
+pytz
+import re
